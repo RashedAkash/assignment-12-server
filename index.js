@@ -32,6 +32,7 @@ async function run() {
     const serviceCollection = client.db('fitness').collection('services')
     const teamCollection = client.db('fitness').collection('team')
     const subCollection = client.db('fitness').collection('subscribe')
+    const blogCollection = client.db('fitness').collection('blogs')
     
 
     //services related api
@@ -43,6 +44,11 @@ async function run() {
     //team related api
      app.get('/team', async (req, res) => {
       const result = await teamCollection.find().toArray();
+      res.send(result);
+     });
+    //blog related api
+     app.get('/blogs', async (req, res) => {
+      const result = await blogCollection.find().toArray();
       res.send(result);
      });
     //subscribe related api
