@@ -31,6 +31,7 @@ async function run() {
     // await client.connect();
     const serviceCollection = client.db('fitness').collection('services')
     const teamCollection = client.db('fitness').collection('team')
+    const subCollection = client.db('fitness').collection('subscribe')
     
 
     //services related api
@@ -41,9 +42,15 @@ async function run() {
 
     //team related api
      app.get('/team', async (req, res) => {
-      const result = await serviceCollection.find().toArray();
+      const result = await teamCollection.find().toArray();
       res.send(result);
-    });
+     });
+    //subscribe related api
+    app.post('/subUser', async (req, res) => {
+      const result = await subCollection.insertOne(req.body);
+      res.send(result);
+    })
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
