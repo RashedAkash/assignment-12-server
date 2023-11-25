@@ -34,6 +34,7 @@ async function run() {
     const subCollection = client.db('fitness').collection('subscribe')
     const blogCollection = client.db('fitness').collection('blogs')
     const reviewsCollection = client.db('fitness').collection('reviews')
+    const usersCollection = client.db('fitness').collection('users')
     
 
     //services related api
@@ -46,6 +47,11 @@ async function run() {
       const result = await reviewsCollection.find().toArray();
       res.send(result);
     });
+    //user related api
+    app.post('/users', async (req,res) => {
+      const result = await usersCollection.insertOne(req.body);
+      res.send(result);
+    })
 
     
 
