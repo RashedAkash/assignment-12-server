@@ -36,11 +36,17 @@ async function run() {
     const reviewsCollection = client.db('fitness').collection('reviews')
     const usersCollection = client.db('fitness').collection('users')
     const galleryCollection = client.db('fitness').collection('gallery')
+    const classesCollection = client.db('fitness').collection('classes')
     
 
     //services related api
     app.get('/services', async (req, res) => {
       const result = await serviceCollection.find().toArray();
+      res.send(result);
+    });
+    //services related api
+    app.get('/classes', async (req, res) => {
+      const result = await classesCollection.find().toArray();
       res.send(result);
     });
     //services related api
