@@ -131,7 +131,12 @@ async function run() {
     app.post('/subUser', async (req, res) => {
       const result = await subCollection.insertOne(req.body);
       res.send(result);
-    })
+    });
+    //get sub
+    app.get('/subUser', async (req, res) => {
+      const result = await subCollection.find().toArray();
+      res.send(result)
+    });
 
 
     // Send a ping to confirm a successful connection
