@@ -37,6 +37,8 @@ async function run() {
     const usersCollection = client.db('fitness').collection('users')
     const galleryCollection = client.db('fitness').collection('gallery')
     const classesCollection = client.db('fitness').collection('classes')
+    const gymClassesCollection = client.db('fitness').collection('gymclass')
+    const trainerCollection = client.db('fitness').collection('trainer')
     
 
     //services related api
@@ -44,7 +46,23 @@ async function run() {
       const result = await serviceCollection.find().toArray();
       res.send(result);
     });
-    //services related api
+    //trainer related api
+    app.get('/trainer', async (req, res) => {
+      const result = await trainerCollection.find().toArray();
+      res.send(result);
+    });
+    //gym class related api
+    app.get('/gymClasses', async (req, res) => {
+      const result = await gymClassesCollection.find().toArray();
+      res.send(result);
+    });
+    app.get('/gymClasses/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await gymClassesCollection.findOne();
+      res.send(result);
+    });
+    //class related api
     app.get('/classes', async (req, res) => {
       const result = await classesCollection.find().toArray();
       res.send(result);
