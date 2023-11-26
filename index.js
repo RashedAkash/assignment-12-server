@@ -39,6 +39,7 @@ async function run() {
     const classesCollection = client.db('fitness').collection('classes')
     const gymClassesCollection = client.db('fitness').collection('gymclass')
     const trainerCollection = client.db('fitness').collection('trainer')
+    const newTrainerCollection = client.db('fitness').collection('newTrainer')
     
 
     //services related api
@@ -49,6 +50,12 @@ async function run() {
     //trainer related api
     app.get('/trainer', async (req, res) => {
       const result = await trainerCollection.find().toArray();
+      res.send(result);
+    });
+    app.get('/trainer/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+      const result = await trainerCollection.findOne(query)
       res.send(result);
     });
     //gym class related api
@@ -80,6 +87,11 @@ async function run() {
     //user related api
     app.post('/users', async (req,res) => {
       const result = await usersCollection.insertOne(req.body);
+      res.send(result);
+    })
+    //new trainer related api
+    app.post('/trainerInfo', async (req,res) => {
+      const result = await newTrainerCollection.insertOne(req.body);
       res.send(result);
     })
 
