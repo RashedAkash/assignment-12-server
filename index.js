@@ -29,6 +29,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
+    const priceCollection = client.db('fitness').collection('price')
     const serviceCollection = client.db('fitness').collection('services')
     const teamCollection = client.db('fitness').collection('team')
     const subCollection = client.db('fitness').collection('subscribe')
@@ -40,11 +41,22 @@ async function run() {
     const gymClassesCollection = client.db('fitness').collection('gymclass')
     const trainerCollection = client.db('fitness').collection('trainer')
     const newTrainerCollection = client.db('fitness').collection('newTrainer')
+    const bookingCollection = client.db('fitness').collection('booking')
     
+    //booking related api
+    app.post('/booking', async (req,res) => {
+      const result = await bookingCollection.insertOne(req.body);
+      res.send(result);
+    })
 
     //services related api
     app.get('/services', async (req, res) => {
       const result = await serviceCollection.find().toArray();
+      res.send(result);
+    });
+    //price related api
+    app.get('/price', async (req, res) => {
+      const result = await priceCollection.find().toArray();
       res.send(result);
     });
     //trainer related api
