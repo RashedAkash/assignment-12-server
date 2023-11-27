@@ -127,6 +127,12 @@ async function run() {
       const result = await newTrainerCollection.insertOne(req.body);
       res.send(result);
     });
+    app.delete('/trainerInfo/trainer/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await newTrainerCollection.deleteOne(query);
+      res.send(result);      
+    })
 
     app.get('/trainerInfo', async (req, res) => {
       const result = await newTrainerCollection.find().toArray();
