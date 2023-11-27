@@ -97,13 +97,39 @@ async function run() {
       res.send(result);
     });
     //user related api
-    app.post('/users', async (req,res) => {
+    app.post('/users', async (req, res) => {
+      const query = { email: req.body.email }
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ message: 'user already exists', insertedId: null })
+      }
       const result = await usersCollection.insertOne(req.body);
       res.send(result);
-    })
+    });
+
+    app.get('/users', async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+    app.patch('/users/admin/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+       const updateDoc = {
+      $set: {
+        role: 'admin'
+      },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result)
+   })
     //new trainer related api
-    app.post('/trainerInfo', async (req,res) => {
+    app.post('/trainerInfo', async (req, res) => {
       const result = await newTrainerCollection.insertOne(req.body);
+      res.send(result);
+    });
+
+    app.get('/trainerInfo', async (req, res) => {
+      const result = await newTrainerCollection.find().toArray();
       res.send(result);
     })
 
@@ -141,7 +167,7 @@ async function run() {
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+   
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
