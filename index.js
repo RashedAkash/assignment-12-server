@@ -71,6 +71,10 @@ async function run() {
       res.send(result);
     });
     //gym class related api
+    app.post('/gymClasses', async (req, res) => {
+      const result = await gymClassesCollection.insertOne(req.body);
+      res.send(result);
+    })
     app.get('/gymClasses', async (req, res) => {
       const result = await gymClassesCollection.find().toArray();
       res.send(result);
@@ -127,11 +131,17 @@ async function run() {
       const result = await newTrainerCollection.insertOne(req.body);
       res.send(result);
     });
-    app.delete('/trainerInfo/trainer/:id', async (req, res) => {
+    app.patch('/trainerInfo/trainer/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await newTrainerCollection.deleteOne(query);
-      res.send(result);      
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+      $set: {
+        role: 'trainer'
+      },
+      };
+      const result = await newTrainerCollection.updateOne(filter, updateDoc);
+      res.send(result);
+      
     })
 
     app.get('/trainerInfo', async (req, res) => {
