@@ -111,6 +111,31 @@ async function run() {
       res.send(result);
     });
 
+  //   app.get('/users/:id', async (req, res) => {
+  //     const id = req.params.id;
+  //     const query = { _id: new ObjectId(id) }
+  //     const result = await usersCollection.findOne(query);
+  //     res.send(result);
+  //   });
+
+  //   app.put('/users/:id', async (req, res) => {
+  //     const id = req.params.id;
+  //           const filter = { _id: new ObjectId(id) }
+  //           const options = { upsert: true };
+  //           const updateUser = req.body;
+  //  const user = {
+  //               $set: {
+  //                   name: updateUser.name,
+  //                   photoURL: updateUser.photoURL,
+  //                   password: updateUser.password,
+                    
+  //               }
+  //           }
+  //   const result = await usersCollection.updateOne(filter, user, options);
+  //           res.send(result);
+
+  //   })
+
     app.get('/users', async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
@@ -126,23 +151,40 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result)
    })
+    app.patch('/users/trainer/:email', async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+       const updateDoc = {
+      $set: {
+        role: 'trainer'
+      },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result)
+   })
     //new trainer related api
     app.post('/trainerInfo', async (req, res) => {
       const result = await newTrainerCollection.insertOne(req.body);
       res.send(result);
     });
-    app.patch('/trainerInfo/trainer/:id', async (req, res) => {
+    app.delete('/trainerInfo/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-      $set: {
-        role: 'trainer'
-      },
-      };
-      const result = await newTrainerCollection.updateOne(filter, updateDoc);
+      const query = { _id: new ObjectId(id) };
+      const result = await newTrainerCollection.deleteOne(query);
       res.send(result);
-      
     })
+    // app.patch('/trainerInfo/trainer/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const filter = { _id: new ObjectId(id) };
+    //   const updateDoc = {
+    //   $set: {
+    //     role: 'trainer'
+    //   },
+    //   };
+    //   const result = await newTrainerCollection.updateOne(filter, updateDoc);
+    //   res.send(result);
+      
+    // })
 
     app.get('/trainerInfo', async (req, res) => {
       const result = await newTrainerCollection.find().toArray();
