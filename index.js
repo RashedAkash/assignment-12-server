@@ -133,13 +133,17 @@ async function run() {
       const count = await forumCollection.countDocuments();
       res.send({result,count});
     });
+    app.post('/forum',verifyToken, async (req, res) => {
+      const result = await forumCollection.insertOne(req.body);
+      res.send(result);
+    })
     //price related api
     app.get('/price', async (req, res) => {
       const result = await priceCollection.find().toArray();
       res.send(result);
     });
     //trainer related api
-    app.get('/trainer', async (req, res) => {
+    app.get('/trainer',verifyToken,verifyAdmin, async (req, res) => {
       const result = await trainerCollection.find().toArray();
       res.send(result);
     });
@@ -150,11 +154,11 @@ async function run() {
       res.send(result);
     });
     //gym class related api
-    app.post('/gymClasses', async (req, res) => {
+    app.post('/gymClasses',verifyToken, async (req, res) => {
       const result = await gymClassesCollection.insertOne(req.body);
       res.send(result);
     })
-    app.get('/gymClasses', async (req, res) => {
+    app.get('/gymClasses',verifyToken, async (req, res) => {
       const result = await gymClassesCollection.find().toArray();
       res.send(result);
     });
@@ -190,14 +194,14 @@ async function run() {
       res.send(result);
     });
 
-  //   app.get('/users/:id', async (req, res) => {
+  //   app.get('/users/:id',verifyToken, async (req, res) => {
   //     const id = req.params.id;
   //     const query = { _id: new ObjectId(id) }
   //     const result = await usersCollection.findOne(query);
   //     res.send(result);
   //   });
 
-  //   app.put('/users/:id', async (req, res) => {
+  //   app.put('/users/:id',verifyToken, async (req, res) => {
   //     const id = req.params.id;
   //           const filter = { _id: new ObjectId(id) }
   //           const options = { upsert: true };
@@ -213,7 +217,7 @@ async function run() {
   //   const result = await usersCollection.updateOne(filter, user, options);
   //           res.send(result);
 
-    //   })
+  //     })
     app.get('/users/admin/:email', verifyToken,  async (req, res) => {
       const email = req.params.email;
       const decEmail = req.decoded.email;
@@ -241,9 +245,26 @@ async function run() {
       const user = await usersCollection.findOne(query);
       let trainer = false;
       if (user) {
-        trainer= user?.role === 'trainer'
+        trainer = user?.role === 'trainer'
       }
-      res.send({trainer})
+      res.send({ trainer })
+
+    });
+
+    //member
+    app.get('/users/member/:email', async (req, res) => {
+      const email = req.params.email;
+      const decEmail = req.params.email;
+      if (email !== decEmail) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let member = false;
+      if (user) {
+        member = user?.role === 'member'
+      }
+      res.send({member})
 
     })
     app.get('/users/member', async (req, res) => {
@@ -262,7 +283,7 @@ async function run() {
       res.send(result);
     });
     
-    app.patch('/users/admin/:id', async (req, res) => {
+    app.patch('/users/admin/:id', verifyToken,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
        const updateDoc = {
@@ -273,7 +294,7 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result)
    })
-    app.patch('/users/trainer/:email',  async (req, res) => {
+    app.patch('/users/trainer/:email', verifyToken, verifyAdmin,  async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
        const updateDoc = {
@@ -334,12 +355,12 @@ async function run() {
       res.send(result);
     })
     //subscribe related api
-    app.post('/subUser', async (req, res) => {
+    app.post('/subUser',verifyToken, async (req, res) => {
       const result = await subCollection.insertOne(req.body);
       res.send(result);
     });
     //get sub
-    app.get('/subUser', async (req, res) => {
+    app.get('/subUser', verifyToken,verifyAdmin, async (req, res) => {
       const result = await subCollection.find().toArray();
       res.send(result)
     });
