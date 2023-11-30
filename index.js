@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const stripe = require("stripe")(process.env.PAYMENT_KEY)
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 //fitness
@@ -10,6 +11,9 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 //middleWare
 app.use(cors());
 app.use(express.json())
+
+
+
 
 
 // // varifyToken
@@ -58,6 +62,27 @@ async function run() {
     const newTrainerCollection = client.db('fitness').collection('newTrainer')
     const bookingCollection = client.db('fitness').collection('booking')
     const forumCollection = client.db('fitness').collection('forum');
+
+    //payment
+    app.post("/create-payment-intent", async (req, res) => {
+      const { salary } = req.body;
+      const amount = parseInt(salary * 100)
+      console.log(amount,'amount');
+
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amount,
+    currency: "usd",
+    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+    // automatic_payment_methods: {
+    //   enabled: true,
+    // },
+  });
+
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
 
 
     //jwt
@@ -143,7 +168,7 @@ async function run() {
       res.send(result);
     });
     //trainer related api
-    app.get('/trainer',verifyToken,verifyAdmin, async (req, res) => {
+    app.get('/trainer',verifyToken, async (req, res) => {
       const result = await trainerCollection.find().toArray();
       res.send(result);
     });
@@ -194,12 +219,12 @@ async function run() {
       res.send(result);
     });
 
-  //   app.get('/users/:id',verifyToken, async (req, res) => {
-  //     const id = req.params.id;
-  //     const query = { _id: new ObjectId(id) }
-  //     const result = await usersCollection.findOne(query);
-  //     res.send(result);
-  //   });
+    // app.get('/users/:email', async (req, res) => {
+    //   const email = req.params.email;
+    //   const query = { _id: new ObjectId(email) }
+    //   const result = await usersCollection.findOne(query);
+    //   res.send(result);
+    // });
 
   //   app.put('/users/:id',verifyToken, async (req, res) => {
   //     const id = req.params.id;
@@ -217,7 +242,9 @@ async function run() {
   //   const result = await usersCollection.updateOne(filter, user, options);
   //           res.send(result);
 
-  //     })
+    //     })
+    
+   
     app.get('/users/admin/:email', verifyToken,  async (req, res) => {
       const email = req.params.email;
       const decEmail = req.decoded.email;
@@ -355,7 +382,7 @@ async function run() {
       res.send(result);
     })
     //subscribe related api
-    app.post('/subUser',verifyToken, async (req, res) => {
+    app.post('/subUser', async (req, res) => {
       const result = await subCollection.insertOne(req.body);
       res.send(result);
     });
